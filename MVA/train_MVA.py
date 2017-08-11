@@ -17,58 +17,19 @@ from ctapipe.image import hillas_parameters, HillasParameterizationError
 from ctapipe.io.hessio import hessio_event_source
 from sklearn.ensemble import RandomForestRegressor
 from ctapipe.reco.hillas_intersection import HillasIntersection
+from base_chain import BaseChain
 import pickle
 
-class TrainMVA(Tool):
+class TrainMVA(BaseChain):
     """
 
     """
     description = "TrainMVA"
-    name = 'ctapipe-TrainMVA'
-
-    infile = Unicode(help='input simtelarray file').tag(config=True)
-
-    outfile = Unicode(help='output fits table').tag(config=True)
-
-    telescopes = List(Int, None, allow_none=True,
-                      help='Telescopes to include from the event file. '
-                           'Default = All telescopes').tag(config=True)
-
-    max_events = Int(default_value=1000000000,
-                     help="Max number of events to include in analysis").tag(config=True)
-
-    amp_cut = Dict().tag(config=True)
-    dist_cut = Dict().tag(config=True)
-    tail_cut = Dict().tag(config=True)
-    pix_cut = Dict().tag(config=True)
-
-    aliases = Dict(dict(infile='TrainMVA.infile',
-                        outfile='TrainMVA.outfile',
-                        telescopes='TrainMVA.telescopes',
-                        amp_cut='TrainMVA.amp_cut',
-                        dist_cut='TrainMVA.dist_cut',
-                        tail_cut='TrainMVA.tail_cut',
-                        pix_cut='TrainMVA.pix_cut',
-                        max_events='TrainMVA.max_events'))
-
+    name = 'ctapipe-train-mva'
 
     def setup(self):
 
         self.geoms = dict()
-        self.amp_cut = {"LSTCam": 100,
-                        "NectarCam": 100,
-                        "FlashCam": 100,
-                        "CHEC": 50}
-
-        self.dist_cut = {"LSTCam": 2. * u.deg,
-                         "NectarCam": 3.3 * u.deg,
-                         "FlashCam": 3. * u.deg,
-                         "CHEC": 3.8 * u.deg}
-
-        self.tail_cut = {"LSTCam": (8, 16),
-                         "NectarCam": (7, 14),
-                         "FlashCam": (7, 14),
-                         "CHEC": (3, 6)}
 
         # Calibrators set to default for now
         self.r1 = HessioR1Calibrator(None, None)
